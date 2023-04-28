@@ -4,27 +4,27 @@ import type { Strategy } from "./types"
 
 export interface AuthModuleOptions extends ModuleOptions {
   plugins?: Array<string | { src: string; ssr: boolean }>
-  ignoreExceptions: boolean
-  resetOnError: boolean | ((...args: unknown[]) => boolean)
-  defaultStrategy: string
-  watchLoggedIn: boolean
-  rewriteRedirects: boolean
-  fullPathRedirect: boolean
-  scopeKey: string
+  ignoreExceptions?: boolean
+  resetOnError?: boolean | ((...args: unknown[]) => boolean)
+  defaultStrategy?: string
+  watchLoggedIn?: boolean
+  rewriteRedirects?: boolean
+  fullPathRedirect?: boolean
+  scopeKey?: string
   redirect: {
-    login: string
-    logout: string
-    callback: string
-    home: string
+    login?: string
+    logout?: string
+    callback?: string
+    home?: string
   }
-  vuex: {
-    namespace: string
+  vuex?: {
+    namespace?: string
   }
-  cookie:
+  cookie?:
     | {
-        prefix: string
-        options: {
-          path: string
+        prefix?: string
+        options?: {
+          path?: string
           expires?: number | Date
           maxAge?: number
           domain?: string
@@ -32,13 +32,13 @@ export interface AuthModuleOptions extends ModuleOptions {
         }
       }
     | false
-  localStorage:
+  localStorage?:
     | {
         prefix: string
       }
     | false
-  strategies: {
-    [strategy: string]: Strategy
+  strategies?: {
+    [strategy: string]: Partial<Strategy>
   }
 }
 
@@ -94,4 +94,43 @@ export const moduleDefaults: AuthModuleOptions = {
   defaultStrategy: "",
 
   strategies: {},
+}
+
+export interface FilledAuthModuleOptions extends AuthModuleOptions {
+  ignoreExceptions: boolean
+  resetOnError: boolean | ((...args: unknown[]) => boolean)
+  defaultStrategy: string
+  watchLoggedIn: boolean
+  rewriteRedirects: boolean
+  fullPathRedirect: boolean
+  scopeKey: string
+  redirect: {
+    login?: string
+    logout?: string
+    callback?: string
+    home?: string
+  }
+  vuex: {
+    namespace: string
+  }
+  cookie:
+    | {
+        prefix: string
+        options: {
+          path: string
+          expires?: number | Date
+          maxAge?: number
+          domain?: string
+          secure?: boolean
+        }
+      }
+    | false
+  localStorage:
+    | {
+        prefix: string
+      }
+    | false
+  strategies: {
+    [strategy: string]: Strategy
+  }
 }

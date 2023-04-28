@@ -5,7 +5,7 @@ import { Nuxt } from "@nuxt/schema"
 import hash from "hasha"
 
 import AUTH_PROVIDERS, { ProviderAliases } from "./providers"
-import type { AuthModuleOptions } from "./options"
+import type { FilledAuthModuleOptions } from "./options"
 import type { Strategy } from "./types"
 
 const BuiltinSchemes = {
@@ -26,7 +26,7 @@ export interface ImportOptions {
 
 export function resolveStrategies(
   nuxt: Nuxt,
-  options: AuthModuleOptions,
+  options: FilledAuthModuleOptions,
   resolver: Resolver
 ): { strategies: Strategy[]; strategyScheme: Record<string, ImportOptions> } {
   const strategies: Strategy[] = []

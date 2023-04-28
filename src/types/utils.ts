@@ -4,6 +4,10 @@ export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[] ? RecursivePartial<U>[] : RecursivePartial<T[P]>
 }
 
+export type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
+}
+
 export type PartialExcept<T, K extends keyof T> = RecursivePartial<T> & Pick<T, K>
 
 export interface Resolver {

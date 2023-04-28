@@ -2,7 +2,7 @@ import { addPlugin, addPluginTemplate, createResolver, defineNuxtModule } from "
 
 import { Nuxt } from "@nuxt/schema"
 
-import { AuthModuleOptions, moduleDefaults } from "./options"
+import { AuthModuleOptions, FilledAuthModuleOptions, moduleDefaults } from "./options"
 import { resolveStrategies } from "./resolve"
 import { resolve } from "path"
 
@@ -14,6 +14,7 @@ export default defineNuxtModule<AuthModuleOptions>({
   // Default configuration options of the Nuxt module
   defaults: moduleDefaults,
   setup(options, nuxt: Nuxt) {
+    const realOptions = options as FilledAuthModuleOptions
     const resolver = createResolver(import.meta.url)
     // Resolve strategies
     const { strategies, strategyScheme } = resolveStrategies(nuxt, options, resolver)
