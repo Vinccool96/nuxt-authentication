@@ -1,32 +1,57 @@
-import type { NuxtApp } from "@nuxt/schema"
-import Vue from "vue"
 import cookie from "cookie"
-import type { AuthModuleOptions } from "../options"
+import { _GettersTree, defineStore, mapStores, StateTree, Store } from "pinia"
+
+import type { FilledAuthModuleOptions } from "../options"
+import { RealNuxtApp } from "../types"
 import { isUnset, isSet, decodeValue, encodeValue, getProp } from "../utils"
 
 // TODO: Normalize type at module itself
-export type StorageOptions = AuthModuleOptions & {
+export type StorageOptions = FilledAuthModuleOptions & {
   initialState: {
     user: null
     loggedIn: boolean
   }
 }
 
+export type StorageContent = {
+  user: null
+  loggedIn: boolean
+  [K: string]: unknown
+}
+
 // TODO: Improve type of storages: Universal / Cookie / Local / State
 
-export class Storage {
-  public ctx: NuxtApp
+function createStore<Id extends string>(namespace: Id, initialState: StorageContent) {
+  const a = defineStore<Id, StorageContent, { authInfo(state: StorageContent): StorageContent }>(namespace, {
+    state: () => {
+      return initialState
+    },
+    getters: {
+      authInfo(state: StorageContent) {
+        return state
+      },
+    },
+  })
+
+  const b = mapStores(a)
+  return b[`${namespace}Store`]()
+}
+
+export class Storage<Id extends string> {
+  public ctx: RealNuxtApp
   public options: StorageOptions
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public state: any
+  public state: Store<Id, StorageContent, { authInfo(state: StorageContent): StorageContent }> | {}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _state: any
   private _usePinia: boolean
 
-  constructor(ctx: NuxtApp, options: StorageOptions) {
+  constructor(ctx: RealNuxtApp, options: StorageOptions) {
     this.ctx = ctx
     this.options = options
+    this._usePinia = false
+    this.state = {}
 
     this._initState()
   }
@@ -106,29 +131,29 @@ export class Storage {
   _initState(): void {
     // Private state is suitable to keep information not being exposed to Vuex store
     // This helps prevent stealing token from SSR response HTML
-    Vue.set(this, "_state", {})
+    this._state = {}
 
     // Use vuex for local state's if possible
-    this._useVuex = this.options.vuex && !!this.ctx.
+    this.ctx.vueApp.config
+    this._usePinia = this.options.pinia !== undefined
 
-    if (this._useVuex) {
-      const storeModule = {
-        namespaced: true,
-        state: () => this.options.initialState,
-        mutations: {
-          SET(state, payload) {
-            Vue.set(state, payload.key, payload.value)
+    if (this._usesPinia()) {
+      const a = defineStore(this.options.pinia.namespace, {
+        state: () => {
+          return this.options.initialState as StorageContent
+        },
+        getters: {
+          authInfo(state) {
+            return state
           },
         },
-      }
-
-      this.ctx.store.registerModule(this.options.vuex.namespace, storeModule, {
-        preserveState: Boolean(this.ctx.store.state[this.options.vuex.namespace]),
       })
 
-      this.state = this.ctx.store.state[this.options.vuex.namespace]
+      const b = mapStores(a)
+
+      this.state = b[`${this.options.pinia.namespace}Store`]()
     } else {
-      Vue.set(this, "state", {})
+      this.state = {}
 
       // eslint-disable-next-line no-console
       console.warn(
@@ -138,16 +163,21 @@ export class Storage {
     }
   }
 
+  private _usesPinia(): this is {
+    state: Store<string, StorageContent, { authInfo(state: StorageContent): StorageContent }>
+  } {
+    return this._usePinia
+  }
+
   setState<V extends unknown>(key: string, value: V): V {
     if (key[0] === "_") {
-      Vue.set(this._state, key, value)
-    } else if (this._useVuex) {
-      this.ctx.store.commit(this.options.vuex.namespace + "/SET", {
-        key,
-        value,
-      })
+      this._state[key] = value
+    } else if (this._usesPinia()) {
+      const modification = {} as Record<string, V>
+      modification[key] = value
+      this.state.$patch(modification as object)
     } else {
-      Vue.set(this.state, key, value)
+      this._state[key] = value
     }
 
     return value
@@ -155,15 +185,17 @@ export class Storage {
 
   getState(key: string): unknown {
     if (key[0] !== "_") {
-      return this.state[key]
+      if (this._usesPinia()) {
+        return this.state.authInfo[key]
+      }
     } else {
       return this._state[key]
     }
   }
 
   watchState(key: string, fn: (value: unknown, oldValue: unknown) => void): (() => void) | undefined {
-    if (this._useVuex) {
-      return this.ctx.store.watch((state) => getProp(state[this.options.vuex.namespace], key), fn)
+    if (this._usePinia) {
+      return this.state.watch((state) => getProp(state[this.options.vuex.namespace], key), fn)
     }
   }
 

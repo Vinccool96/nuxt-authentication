@@ -1,4 +1,5 @@
 import type { Middleware } from "@nuxt/types"
+
 import type { Route } from "../types"
 import { routeOption, getMatchedComponents, normalizePath } from "../utils"
 

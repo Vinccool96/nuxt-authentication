@@ -16,13 +16,15 @@ export default defineNuxtConfig({
   //   //   }),
   //   // },
   // ],
-  modules: ["../src/module"],
+  modules: ["../src/module", "nuxt-proxy"],
   proxy: {
-    // "/api": "http://localhost:3000",
-    // "/laravel": {
-    //   target: "https://laravel-auth.nuxtjs.app",
-    //   pathRewrite: { "^/laravel": "/" },
-    // },
+    options: {
+      "/api": "http://localhost:3000",
+      "/laravel": {
+        target: "https://laravel-auth.nuxtjs.app",
+        pathRewrite: { "^/laravel": "/" },
+      },
+    },
   },
   authentication: {
     redirect: {

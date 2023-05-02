@@ -9,18 +9,19 @@ import type {
   RefreshableScheme,
   SchemeCheck,
 } from "../types"
-import type { AuthModuleOptions } from "../options"
+import type { FilledAuthModuleOptions } from "../options"
 import { routeOption, isRelativeURL, isSet, isSameURL, getProp, normalizePath } from "../utils"
 import { Storage } from "./storage"
+import { RealNuxtApp } from "../types"
 
 export type ErrorListener = (...args: unknown[]) => void
 export type RedirectListener = (to: string, from: string) => string
 
 export class Auth {
-  public ctx: NuxtApp
-  public options: AuthModuleOptions
+  public ctx: RealNuxtApp
+  public options: FilledAuthModuleOptions
   public strategies: Record<string, Scheme> = {}
-  public error?: Error
+  public error?: Error | null
   public $storage: Storage
   public $state
   private _errorListeners: ErrorListener[] = []
@@ -28,7 +29,7 @@ export class Auth {
   private _stateWarnShown: boolean
   private _getStateWarnShown: boolean
 
-  constructor(ctx: NuxtApp, options: AuthModuleOptions) {
+  constructor(ctx: RealNuxtApp, options: FilledAuthModuleOptions) {
     this.ctx = ctx
     this.options = options
 
@@ -110,7 +111,7 @@ export class Auth {
       // Call mounted for active strategy on initial load
       await this.mounted()
     } catch (error) {
-      this.callOnError(error)
+      this.callOnError(error as Error)
     } finally {
       // Watch for loggedIn changes only in client side
       if (process.client && this.options.watchLoggedIn) {
@@ -166,7 +167,7 @@ export class Auth {
       return this.fetchUserOnce()
     }
 
-    return Promise.resolve(this.getStrategy().mounted(...args)).catch((error) => {
+    return Promise.resolve(this.getStrategy()?.mounted(...args)).catch((error) => {
       this.callOnError(error, { method: "mounted" })
       return Promise.reject(error)
     })

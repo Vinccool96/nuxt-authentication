@@ -1,4 +1,4 @@
-import { addPlugin, addPluginTemplate, createResolver, defineNuxtModule } from "@nuxt/kit"
+import { addPlugin, addPluginTemplate, createResolver, defineNuxtModule, addImports } from "@nuxt/kit"
 
 import { Nuxt } from "@nuxt/schema"
 
@@ -17,7 +17,7 @@ export default defineNuxtModule<AuthModuleOptions>({
     const realOptions = options as FilledAuthModuleOptions
     const resolver = createResolver(import.meta.url)
     // Resolve strategies
-    const { strategies, strategyScheme } = resolveStrategies(nuxt, options, resolver)
+    const { strategies, strategyScheme } = resolveStrategies(nuxt, realOptions, resolver)
     // @ts-ignore
     delete options.strategies
 
@@ -31,7 +31,7 @@ export default defineNuxtModule<AuthModuleOptions>({
     options.defaultStrategy = options.defaultStrategy || strategies.length ? strategies[0].name : ""
 
     addPluginTemplate({
-      src: resolver.resolve("./runtime/plugin.ts"),
+      src: resolver.resolve("./added/templates/plugin.ts"),
       filename: "auth.ts",
       options: {
         options,

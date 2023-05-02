@@ -31,8 +31,11 @@
   "dependencies": {
     "@nuxt/kit": "^3.4.2",
     "@nuxt/schema": "^3.4.2",
+    "cookie": "^0.5.0",
     "hasha": "^5.2.2",
-    "jwt-decode": "^3.1.2"
+    "jwt-decode": "^3.1.2",
+    "nuxt-proxy": "^0.4.1",
+    "requrl": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
@@ -41,12 +44,15 @@
     "@nuxt/eslint-config": "^0.1.1",
     "@nuxt/module-builder": "^0.3.0",
     "@nuxt/test-utils": "^3.4.2",
+    "@pinia/nuxt": "^0.4.9",
+    "@types/cookie": "^0.5.1",
     "@types/node": "^18",
     "changelogen": "^0.5.3",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "nuxt": "^3.4.2",
+    "pinia": "^2.0.35",
     "prettier": "^2.8.8",
     "vitest": "^0.30.1"
   }

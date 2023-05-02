@@ -17,7 +17,7 @@ export interface AuthModuleOptions extends ModuleOptions {
     callback?: string
     home?: string
   }
-  vuex?: {
+  pinia?: {
     namespace?: string
   }
   cookie?:
@@ -70,7 +70,7 @@ export const moduleDefaults: AuthModuleOptions = {
 
   //  -- Vuex Store --
 
-  vuex: {
+  pinia: {
     namespace: "auth",
   },
 
@@ -110,7 +110,7 @@ export interface FilledAuthModuleOptions extends AuthModuleOptions {
     callback?: string
     home?: string
   }
-  vuex: {
+  pinia: {
     namespace: string
   }
   cookie:

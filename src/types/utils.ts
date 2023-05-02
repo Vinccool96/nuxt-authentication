@@ -1,5 +1,7 @@
 import { ResolvePathOptions } from "@nuxt/kit"
 
+import { Plugin } from "nuxt/app"
+
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[] ? RecursivePartial<U>[] : RecursivePartial<T[P]>
 }
@@ -20,3 +22,5 @@ export type ElementOf<T extends Array<unknown>> = T extends Array<infer E> ? E :
 export function isArray<T>(obj: Array<T> | T): obj is Array<T> {
   return Array.isArray(obj)
 }
+
+export type RealNuxtApp = Parameters<Plugin>[0]
